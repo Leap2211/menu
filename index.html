@@ -1,315 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Restaurant Menu</title>
-    <style>
-      :root {
-        --primary-color: #8c0a39;
-        --secondary-color: #f8f9fa;
-        --text-color: #333;
-        --border-color: #e0e0e0;
-        --error-color: #dc3545;
-        --success-color: #28a745;
-      }
-
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        line-height: 1.6;
-        color: var(--text-color);
-        background-color: #f5f5f5;
-        padding: 0;
-        margin: 0;
-      }
-
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: white;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        min-height: 100vh;
-      }
-
-      header {
-        text-align: center;
-        padding: 20px 0;
-        border-bottom: 2px solid var(--primary-color);
-        margin-bottom: 30px;
-      }
-
-      h1 {
-        color: var(--primary-color);
-        margin: 0;
-        font-size: 2.2rem;
-      }
-
-      .last-updated {
-        text-align: center;
-        color: #666;
-        font-size: 0.9rem;
-        margin-bottom: 20px;
-      }
-
-      .menu-categories {
-        margin-bottom: 30px;
-      }
-
-      .category {
-        margin-bottom: 25px;
-      }
-
-      .category-name {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 10px 15px;
-        border-radius: 5px;
-        font-weight: bold;
-        margin-bottom: 15px;
-      }
-
-      .menu-items {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 15px;
-      }
-
-      .menu-item {
-        border: 1px solid var(--border-color);
-        border-radius: 5px;
-        padding: 15px;
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
-
-      .menu-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      }
-
-      .item-name {
-        font-weight: bold;
-        font-size: 1.1rem;
-        margin-bottom: 5px;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .item-price {
-        color: var(--primary-color);
-        font-weight: bold;
-      }
-
-      .item-description {
-        color: #666;
-        font-size: 0.9rem;
-        margin-bottom: 10px;
-      }
-
-      .item-details {
-        font-size: 0.85rem;
-        color: #777;
-      }
-
-      .error-message {
-        background-color: var(--error-color);
-        color: white;
-        padding: 15px;
-        border-radius: 5px;
-        text-align: center;
-        margin: 20px 0;
-      }
-
-      .loading {
-        text-align: center;
-        padding: 30px;
-        color: #666;
-      }
-
-      footer {
-        text-align: center;
-        margin-top: 40px;
-        padding-top: 20px;
-        border-top: 1px solid var(--border-color);
-        color: #666;
-        font-size: 0.8rem;
-      }
-
-      @media (max-width: 600px) {
-        .container {
-          padding: 15px;
-        }
-
-        .menu-items {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1>Restaurant Menu</h1>
-      </header>
-
-      <div id="loading" class="loading">Loading menu...</div>
-
-      <div id="last-updated" class="last-updated"></div>
-
-      <div id="error" class="error-message" style="display: none"></div>
-
-      <div
-        id="menu-container"
-        class="menu-categories"
-        style="display: none"
-      ></div>
-
-      <footer>
-        <p>Scan the QR code again to get the latest menu updates</p>
-      </footer>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Restaurant Menu</title>
+  <style>
+    /* Keep your existing styles */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Restaurant Menu</h1>
+    </header>
+    
+    <div id="loading" class="loading">
+      Loading menu...
     </div>
+    
+    <div id="last-updated" class="last-updated"></div>
+    
+    <div id="error" class="error-message" style="display: none;"></div>
+    
+    <div id="menu-container" class="menu-categories" style="display: none;"></div>
+    
+    <footer>
+      <p>Scan the QR code again to get the latest menu updates</p>
+    </footer>
+  </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const loadingElement = document.getElementById("loading");
-        const errorElement = document.getElementById("error");
-        const menuContainer = document.getElementById("menu-container");
-        const lastUpdatedElement = document.getElementById("last-updated");
-
-        // Get query parameters
-        function getQueryParam(param) {
-          const urlParams = new URLSearchParams(window.location.search);
-          return urlParams.get(param);
+  <!-- Use aes-js instead of CryptoJS -->
+  <script src="https://cdn.jsdelivr.net/npm/aes-js@3.1.2/index.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loadingElement = document.getElementById('loading');
+      const errorElement = document.getElementById('error');
+      const menuContainer = document.getElementById('menu-container');
+      const lastUpdatedElement = document.getElementById('last-updated');
+      
+      // Get query parameters
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+      
+      // Convert base64 to byte array
+      function base64ToBytes(base64) {
+        const binaryString = atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
         }
+        return bytes;
+      }
 
-        // Decrypt the data
-        function decryptData(encryptedData, ivBase64) {
-          try {
-            const key = CryptoJS.enc.Utf8.parse(
-              "12345678901234567890123456789012"
-            );
-            const iv = CryptoJS.enc.Base64.parse(ivBase64);
-            console.log(
-              "Decrypting with key:",
-              CryptoJS.enc.Utf8.stringify(key)
-            );
-            console.log("Encrypted data (base64):", encryptedData);
-            console.log("IV (base64):", ivBase64);
+      // Convert string to byte array (UTF-8)
+      function stringToBytes(str) {
+        const encoder = new TextEncoder();
+        return encoder.encode(str);
+      }
 
-            const decrypted = CryptoJS.AES.decrypt(encryptedData, key, {
-              iv: iv,
-              mode: CryptoJS.mode.CBC,
-              padding: CryptoJS.pad.Pkcs7,
-            });
-            const decryptedString = decrypted.toString(CryptoJS.enc.Utf8);
-            console.log("Decrypted string (raw):", decryptedString); // Log raw output
+      // Convert byte array to string (UTF-8)
+      function bytesToString(bytes) {
+        const decoder = new TextDecoder('utf-8');
+        return decoder.decode(bytes);
+      }
 
-            if (!decryptedString) {
-              throw new Error("Decryption failed - empty output");
-            }
+      // Decrypt the data using aes-js
+      function decryptData(encryptedData, ivBase64) {
+        try {
+          // Convert key, IV, and encrypted data to bytes
+          const key = stringToBytes('12345678901234567890123456789012'); // 32 bytes for AES-256
+          const iv = base64ToBytes(ivBase64);
+          const encryptedBytes = base64ToBytes(encryptedData);
 
-            return JSON.parse(decryptedString);
-          } catch (e) {
-            console.error("Decryption error:", e);
-            throw new Error(
-              "Failed to decrypt menu data. Please scan a valid QR code."
-            );
+          // Decrypt using aes-js (CBC mode with PKCS7 padding)
+          const aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
+          const decryptedBytes = aesCbc.decrypt(encryptedBytes);
+
+          // Remove PKCS7 padding
+          const paddingLength = decryptedBytes[decryptedBytes.length - 1];
+          const unpaddedBytes = decryptedBytes.slice(0, decryptedBytes.length - paddingLength);
+
+          // Convert decrypted bytes to string
+          const decryptedString = bytesToString(unpaddedBytes);
+          console.log('Decrypted string (raw):', decryptedString);
+
+          if (!decryptedString) {
+            throw new Error('Decryption failed - empty output');
           }
+
+          return JSON.parse(decryptedString);
+        } catch (e) {
+          console.error('Decryption error:', e);
+          throw new Error('Failed to decrypt menu data. Please scan a valid QR code.');
         }
-
-        // Format date
-        function formatDate(dateString) {
-          if (!dateString) return "Unknown";
-          try {
-            const date = new Date(dateString);
-            return date.toLocaleString();
-          } catch (e) {
-            return dateString;
-          }
+      }
+      
+      // Format date
+      function formatDate(dateString) {
+        if (!dateString) return 'Unknown';
+        try {
+          const date = new Date(dateString);
+          return date.toLocaleString();
+        } catch (e) {
+          return dateString;
         }
-
-        // Display the menu
-        function displayMenu(menuData) {
-          if (!menuData || !menuData.menu || !Array.isArray(menuData.menu)) {
-            throw new Error("Invalid menu data structure");
+      }
+      
+      // Display the menu
+      function displayMenu(menuData) {
+        if (!menuData || !menuData.menu || !Array.isArray(menuData.menu)) {
+          throw new Error('Invalid menu data structure');
+        }
+        
+        const categories = {};
+        menuData.menu.forEach(item => {
+          const category = item.category || 'Main Menu';
+          if (!categories[category]) {
+            categories[category] = [];
           }
-
-          // Group items by category if they have categories
-          const categories = {};
-          menuData.menu.forEach((item) => {
-            const category = item.category || "Main Menu";
-            if (!categories[category]) {
-              categories[category] = [];
-            }
-            categories[category].push(item);
-          });
-
-          // Create HTML for each category
-          let menuHtml = "";
-          for (const [categoryName, items] of Object.entries(categories)) {
-            menuHtml += `
+          categories[category].push(item);
+        });
+        
+        let menuHtml = '';
+        for (const [categoryName, items] of Object.entries(categories)) {
+          menuHtml += `
             <div class="category">
               <div class="category-name">${categoryName}</div>
               <div class="menu-items">
-                ${items
-                  .map(
-                    (item) => `
+                ${items.map(item => `
                   <div class="menu-item">
                     <div class="item-name">
-                      <span>${item.name || "Unnamed Item"}</span>
-                      <span class="item-price">$${(item.price || 0).toFixed(
-                        2
-                      )}</span>
+                      <span>${item.name || 'Unnamed Item'}</span>
+                      <span class="item-price">$${(item.price || 0).toFixed(2)}</span>
                     </div>
-                    ${
-                      item.description
-                        ? `<div class="item-description">${item.description}</div>`
-                        : ""
-                    }
-                    ${
-                      item.details
-                        ? `<div class="item-details">${item.details}</div>`
-                        : ""
-                    }
+                    ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
+                    ${item.details ? `<div class="item-details">${item.details}</div>` : ''}
                   </div>
-                `
-                  )
-                  .join("")}
+                `).join('')}
               </div>
             </div>
           `;
-          }
-
-          menuContainer.innerHTML = menuHtml;
-          lastUpdatedElement.textContent = `Last updated: ${formatDate(
-            menuData.lastUpdated
-          )}`;
-
-          // Hide loading, show menu
-          loadingElement.style.display = "none";
-          menuContainer.style.display = "block";
         }
-
-        // Main execution
-        try {
-          const encryptedData = getQueryParam("data");
-          const ivBase64 = getQueryParam("iv");
-
-          if (!encryptedData || !ivBase64) {
-            throw new Error("Missing required parameters in URL");
-          }
-
-          const menuData = decryptData(encryptedData, ivBase64);
-          displayMenu(menuData);
-        } catch (error) {
-          console.error("Error:", error);
-          loadingElement.style.display = "none";
-          errorElement.style.display = "block";
-          errorElement.textContent = error.message;
+        
+        menuContainer.innerHTML = menuHtml;
+        lastUpdatedElement.textContent = `Last updated: ${formatDate(menuData.lastUpdated)}`;
+        
+        loadingElement.style.display = 'none';
+        menuContainer.style.display = 'block';
+      }
+      
+      // Main execution
+      try {
+        const encryptedData = getQueryParam('data');
+        const ivBase64 = getQueryParam('iv');
+        
+        if (!encryptedData || !ivBase64) {
+          throw new Error('Missing required parameters in URL');
         }
-      });
-    </script>
-  </body>
+        
+        const menuData = decryptData(encryptedData, ivBase64);
+        displayMenu(menuData);
+      } catch (error) {
+        console.error('Error:', error);
+        loadingElement.style.display = 'none';
+        errorElement.style.display = 'block';
+        errorElement.textContent = error.message;
+      }
+    });
+  </script>
+</body>
 </html>
