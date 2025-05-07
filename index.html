@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Viewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+    h1 { text-align: center; }
+    ul { list-style-type: none; padding: 0; }
+    li { padding: 10px; border-bottom: 1px solid #ddd; }
+    .error { color: red; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>Menu</h1>
+  <div id="last-updated"></div>
+  <ul id="menu-list"></ul>
+  <div id="error" class="error"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    function decryptData(encryptedBase64, ivBase64, key) {
+      try {
+        const iv = CryptoJS.enc.Base64.parse(ivBase64);
+        const decrypted = CryptoJS.AES.decrypt(
+          encryptedBase64,
+          CryptoJS.enc.Utf8.parse(key),
+          { iv: iv }
+        );
+        const decryptedString = decrypted.toString(CryptoJS.enc.Utf8);
+        console.log('Decrypted string:', decryptedString); // Debug log
+        return JSON.parse(decryptedString);
+      } catch (e) {
+        throw new Error('Failed to decrypt or parse data: ' + e.message);
+      }
+    }
+
+    (function () {
+      const encryptedData = getQueryParam('data');
+      const ivBase64 = getQueryParam('iv');
+      const key = '12345678901234567890123456789012';
+      const errorDiv = document.getElementById('error');
+      const menuList = document.getElementById('menu-list');
+      const lastUpdatedDiv = document.getElementById('last-updated');
+
+      if (!encryptedData || !ivBase64) {
+        errorDiv.textContent = 'Missing encrypted data or IV';
+        return;
+      }
+
+      try {
+        const decryptedData = decryptData(encryptedData, ivBase64, key);
+        lastUpdatedDiv.textContent = `Last Updated: ${decryptedData.lastUpdated}`;
+        decryptedData.menu.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = `${item.name}: $${item.price}`;
+          menuList.appendChild(li);
+        });
+      } catch (e) {
+        errorDiv.textContent = e.message;
+      }
+    })();
+  </script>
+</body>
+</html>
